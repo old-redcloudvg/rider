@@ -10,6 +10,7 @@ use tokio::task::JoinSet;
 /// Error returned from [`Rider::spawn`] function.
 ///
 /// A spawn operation can fail only if the rider is off.
+#[derive(Debug)]
 pub struct RiderError(());
 
 /// Task executor that maintains a maximum number of tasks running concurrently
@@ -31,6 +32,7 @@ pub struct RiderError(());
 ///     Ok(())
 /// }
 /// ```
+#[derive(Debug)]
 pub struct Rider {
     sem: Arc<Semaphore>,
     set: JoinSet<()>,
