@@ -1,4 +1,5 @@
 //! The library provides a bounded executor for tokio for a convenient way to run a fixed number of tasks concurrently
+//!
 //! See: [`Rider::new`], [`Rider::spawn`] and [`Rider::shutdown`]
 
 use std::future::Future;
