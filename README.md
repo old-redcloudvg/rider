@@ -1,5 +1,9 @@
 # rider
 
+[![License](https://img.shields.io/badge/license-GNU_GPLv3-blue.svg)](https://choosealicense.com/licenses/gpl-3.0/)
+[![Cargo](https://img.shields.io/crates/v/rider.svg)](https://crates.io/crates/rider)
+[![Documentation](https://docs.rs/rider/badge.svg)](https://docs.rs/rider)
+
 bounded executor for tokio; limit the count of tasks running
 
 ```rust
