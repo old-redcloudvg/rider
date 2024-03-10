@@ -7,7 +7,7 @@ use driver::{Driver, DriverError};
 
 #[tokio::main]
 async fn main() -> Result<(), DriverError> {
-    // create executor that allow at most 10 task running concurrently
+    // create an executor that allows at most 10 task running concurrently
     let driver = Driver::new(10);
 
     for index in 0..10000 {
