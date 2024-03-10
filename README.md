@@ -1,17 +1,17 @@
-# driver
+# rider
 
 bounded executor for tokio; limit the count of tasks running
 
 ```rust
-use driver::{Driver, DriverError};
+use rider::{Rider, RiderError};
 
 #[tokio::main]
-async fn main() -> Result<(), DriverError> {
+async fn main() -> Result<(), RiderError> {
     // create an executor that allows at most 10 task running concurrently
-    let driver = Driver::new(10);
+    let rider = Rider::new(10);
 
     for index in 0..10000 {
-        driver
+        rider
             .spawn(async move {
                 println!("{}", index);
             })
@@ -19,6 +19,6 @@ async fn main() -> Result<(), DriverError> {
     }
 
     // Deny further tasks and join remaining tasks
-    driver.shutdown().await;
+    rider.shutdown().await;
 }
 ```

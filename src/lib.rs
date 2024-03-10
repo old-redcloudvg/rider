@@ -1,5 +1,5 @@
 //! The library provides a bounded executor for tokio for a convenient way to run a fixed number of tasks concurrently
-//! See: [`Driver::new`], [`Driver::spawn`] and [`Driver::shutdown`]
+//! See: [`Rider::new`], [`Rider::spawn`] and [`Rider::shutdown`]
 
 use std::future::Future;
 use std::sync::Arc;
@@ -7,70 +7,70 @@ use std::sync::Arc;
 use tokio::sync::Semaphore;
 use tokio::task::JoinSet;
 
-/// Error returned from [`Driver::spawn`] function.
+/// Error returned from [`Rider::spawn`] function.
 ///
-/// A spawn operation can fail only if the driver is off.
-pub struct DriverError(());
+/// A spawn operation can fail only if the rider is off.
+pub struct RiderError(());
 
 /// Task executor that maintains a maximum number of tasks running concurrently
 ///
 /// # Example
 ///
 /// ```rust
-/// use driver::{Driver, DriverError};
+/// use rider::{Rider, RiderError};
 ///
-/// async fn main() -> Result<(), DriverError> {
-///     let mut driver = Driver::new(10);
+/// async fn main() -> Result<(), RiderError> {
+///     let mut rider = Rider::new(10);
 ///     for _ in 0..100 {
-///         driver
+///         rider
 ///             .spawn(async { /* do whatever you want */ })
 ///             .await?;
 ///     }
-///     driver.shutdown().await;
+///     rider.shutdown().await;
 ///     Ok(())
 /// }
 /// ```
-pub struct Driver {
+pub struct Rider {
     sem: Arc<Semaphore>,
     set: JoinSet<()>,
 }
 
-impl DriverError {
-    /// Instantiate [`DriverError`]
-    fn closed() -> DriverError {
-        DriverError(())
+impl RiderError {
+    /// Instantiate [`RiderError`]
+    fn closed() -> RiderError {
+        RiderError(())
     }
 }
 
-impl Driver {
-    /// Maximum number of tasks which a driver can hold. It is `usize::MAX >> 3`.
+impl Rider {
+    /// Maximum number of tasks which a rider can hold. It is `usize::MAX >> 3`.
     ///
     /// Exceeding this limit typically results in a panic.
     pub const MAX_CAPACITY: usize = Semaphore::MAX_PERMITS;
 
-    /// Creates a new driver with the given capacity.
+    /// Creates a new rider with the given capacity.
     ///
     /// # Panics
     ///
-    /// Panic if `capacity` is greater than [`Driver::MAX_CAPACITY`]
+    /// Panic if `capacity` is greater than [`Rider::MAX_CAPACITY`]
     ///
     /// # Example
     ///
     /// ```rust
-    /// use driver::Driver;
+    /// use rider::Rider;
     ///
     /// fn main() {
-    ///     let driver = Driver::new(10);
+    ///     let rider = Rider::new(10);
     ///     // ...
     /// }
     /// ```
-    pub fn new(capacity: usize) -> Driver {
+    pub fn new(capacity: usize) -> Rider {
         let sem = Arc::new(Semaphore::new(capacity));
         let set = JoinSet::new();
-        Driver { sem, set }
+        Rider { sem, set }
     }
 
-    /// Suspends until a seat is available and spawn the provided task on this [`Driver`].
+    /// Suspends until a seat is available and spawn the provided task on this [`Rider`].
     ///
     /// The provided future will start running in the background once the function returns.
     ///
@@ -86,20 +86,20 @@ impl Driver {
     /// # Example
     ///
     /// ```rust
-    /// use driver::{Driver, DriverError};
+    /// use rider::{Rider, RiderError};
     ///
-    /// async fn main() -> Result<(), DriverError> {
-    ///     let mut driver = Driver::new(10);
+    /// async fn main() -> Result<(), RiderError> {
+    ///     let mut rider = Rider::new(10);
     ///     for _ in 0..100 {
-    ///         driver.spawn(async move {
+    ///         rider.spawn(async move {
     ///             // Distribute your work
     ///         }).await?;
     ///     }
-    ///     driver.shutdown().await;
+    ///     rider.shutdown().await;
     ///     Ok(())
     /// }
     /// ```
-    pub async fn spawn<F>(&mut self, task: F) -> Result<(), DriverError>
+    pub async fn spawn<F>(&mut self, task: F) -> Result<(), RiderError>
     where
         F: Future<Output = ()>,
         F: Send + 'static,
@@ -109,7 +109,7 @@ impl Driver {
             .clone()
             .acquire_owned()
             .await
-            .map_err(|_| DriverError::closed())?;
+            .map_err(|_| RiderError::closed())?;
 
         self.set.spawn(async move {
             task.await;
@@ -119,24 +119,24 @@ impl Driver {
         Ok(())
     }
 
-    /// Closes the driver.
-    /// This prevents calls to further [`Driver::spawn`] calls, and it waits for remaining tasks to complete.
+    /// Closes the rider.
+    /// This prevents calls to further [`Rider::spawn`] calls, and it waits for remaining tasks to complete.
     ///
     /// # Example
     ///
     /// ```rust
-    /// use driver::Driver;
+    /// use rider::Rider;
     ///
     /// async fn main() {
-    ///     let mut driver = Driver::new(10);
+    ///     let mut rider = Rider::new(10);
     ///     // ...
-    ///     driver.shutdown().await;
+    ///     rider.shutdown().await;
     /// }
     /// ```
     pub async fn shutdown(mut self) {
         self.sem.close();
         while let Some(handle) = self.set.join_next().await {
-            handle.expect("task in driver failed");
+            handle.expect("task in rider failed");
         }
     }
 }

@@ -1,12 +1,12 @@
 [package]
-name = "driver"
+name = "rider"
 version = "0.1.0"
 edition = "2021"
 description = "bounded executor for tokio; limit the count of tasks running 🚦"
 readme = "README.md"
 license-file = "LICENSE"
-repository = "https://github.com/redcloudvg/driver"
-documentation = "https://docs.rs/driver"
+repository = "https://github.com/redcloudvg/rider"
+documentation = "https://docs.rs/rider"
 categories = ["concurrency"]
 
 [dependencies]
