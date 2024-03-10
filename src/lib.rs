@@ -19,6 +19,7 @@ pub struct RiderError(());
 /// ```rust
 /// use rider::{Rider, RiderError};
 ///
+/// #[tokio::main]
 /// async fn main() -> Result<(), RiderError> {
 ///     let mut rider = Rider::new(10);
 ///     for _ in 0..100 {
@@ -88,6 +89,7 @@ impl Rider {
     /// ```rust
     /// use rider::{Rider, RiderError};
     ///
+    /// #[tokio::main]
     /// async fn main() -> Result<(), RiderError> {
     ///     let mut rider = Rider::new(10);
     ///     for _ in 0..100 {
@@ -127,6 +129,7 @@ impl Rider {
     /// ```rust
     /// use rider::Rider;
     ///
+    /// #[tokio::main]
     /// async fn main() {
     ///     let mut rider = Rider::new(10);
     ///     // ...
