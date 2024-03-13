@@ -1,6 +1,6 @@
 [package]
 name = "rider"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 description = "bounded executor for tokio; limit the count of tasks running 🚦"
 readme = "README.md"
