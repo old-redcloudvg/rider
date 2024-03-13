@@ -6,7 +6,7 @@ use std::future::Future;
 use std::sync::Arc;
 
 use tokio::sync::Semaphore;
-use tokio::task::JoinSet;
+use tokio::task::{AbortHandle, JoinSet};
 
 /// Error returned from [`Rider::spawn`] function.
 ///
@@ -104,7 +104,7 @@ impl Rider {
     ///     Ok(())
     /// }
     /// ```
-    pub async fn spawn<F>(&mut self, task: F) -> Result<(), RiderError>
+    pub async fn spawn<F>(&mut self, task: F) -> Result<AbortHandle, RiderError>
     where
         F: Future<Output = ()>,
         F: Send + 'static,
@@ -116,12 +116,10 @@ impl Rider {
             .await
             .map_err(|_| RiderError::closed())?;
 
-        self.set.spawn(async move {
+        Ok(self.set.spawn(async move {
             task.await;
             drop(permit);
-        });
-
-        Ok(())
+        }))
     }
 
     /// Closes the rider.
