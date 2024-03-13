@@ -125,6 +125,10 @@ impl Rider {
     /// Closes the rider.
     /// This prevents calls to further [`Rider::spawn`] calls, and it waits for remaining tasks to complete.
     ///
+    /// # Panics
+    ///
+    /// The method panics if one of the tasks failed to complete.
+    ///
     /// # Example
     ///
     /// ```rust
